@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Consequence Course: An Alcohol Awareness Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the game */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        h1 {
+            color: #2c3e50; /* Dark blue heading */
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e; /* Slightly lighter blue heading */
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .challenge-section {
+            background-color: #ecf0f1; /* Light gray for sections */
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #dde1e6;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button-primary {
+            background-color: #3498db; /* Blue */
+            border: none;
+        }
+        .button-primary:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .button-success {
+            background-color: #27ae60; /* Green */
+            border: none;
+        }
+        .button-success:hover {
+            background-color: #229a56; /* Darker green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .button-danger {
+            background-color: #e74c3c; /* Red */
+            border: none;
+        }
+        .button-danger:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        input[type="text"] {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            width: calc(100% - 30px);
+            max-width: 400px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 1px solid;
+        }
+        .feedback.correct {
+            background-color: #e8f8f5;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+        .feedback.incorrect {
+            background-color: #fdeded;
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #34495e;
+            margin-top: 20px;
+        }
+        .timer-display {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e67e22; /* Orange for timer */
+            margin-bottom: 20px;
+        }
+        .option-button {
+            background-color: #f39c12; /* Orange */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        .option-button:hover {
+            background-color: #e08e0b; /* Darker orange */
+            transform: translateY(-1px);
+        }
+        .distorted-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            /* Simulates visual distortion due to alcohol */
+            transform: skewX(-5deg) scale(1.05);
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            filter: blur(0.5px);
+            transition: all 0.5s ease-in-out;
+            display: inline-block;
+        }
+        .delay-sim-input {
+            opacity: 0.5; /* Simulate slower processing */
+            pointer-events: none; /* Disable immediate input */
+        }
+        /* Hidden elements by default */
+        .hidden {
+            display: none;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        .modal-close-button:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer" class="game-container">
+        <h1>The Consequence Course: An Alcohol Awareness Game</h1>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="challenge-section">
+            <h2>Welcome, Teams!</h2>
+            <p>Get ready for "The Consequence Course" – an outdoor game designed to challenge your teamwork and understanding of how alcohol affects judgment and actions.</p>
+            <p>Your team will navigate a series of stations, each presenting a scenario related to alcohol. You'll need to solve puzzles, make decisions, and complete physical challenges. Your performance will reflect the "consequences" of your choices.</p>
+            <p>Before you begin, gather your team and make sure you have a pen and paper for notes. Find an open outdoor space!</p>
+            <p><strong>Rules:</strong></p>
+            <ul class="list-disc list-inside text-left mx-auto max-w-md my-4 text-gray-700">
+                <li>Work together as a team.</li>
+                <li>Read instructions carefully.</li>
+                <li>Simulate the outdoor challenges honestly.</li>
+                <li>There's no real alcohol involved, only simulated effects for learning.</li>
+            </ul>
+            <button id="startButton" class="button button-success">Start Game</button>
+        </div>
+
+        <!-- Game Play Area -->
+        <div id="gamePlayArea" class="hidden">
+            <div class="timer-display">Time Remaining: <span id="timer">05:00</span></div>
+            <div class="score-display">Team Score: <span id="score">0</span> points</div>
+
+            <!-- Station 1: Impaired Vision & Judgment Challenge -->
+            <div id="station1" class="challenge-section hidden">
+                <h2>Station 1: Blurry Vision & Mixed Signals</h2>
+                <p><strong>Outdoor Task:</strong> Find three distinct objects (e.g., a specific leaf, a smooth stone, a small stick) within a 5-meter radius of your starting point. Take a picture of them. This task simulates how alcohol can make it harder to focus and find what you're looking for.</p>
+                <p><strong>Digital Challenge:</strong> One team member (acting "impaired") needs to decipher a scrambled message. The other team members must guide them. Only the "impaired" person can type the answer.</p>
+                <p>The scrambled word is: <span id="scrambledWord" class="distorted-text"></span></p>
+                <input type="text" id="station1Answer" placeholder="Type the unscrambled word here">
+                <button id="station1Submit" class="button button-primary">Submit Answer</button>
+                <div id="station1Feedback" class="feedback hidden"></div>
+            </div>
+
+            <!-- Station 2: Slowed Reaction Time & Coordination -->
+            <div id="station2" class="challenge-section hidden">
+                <h2>Station 2: Slowed Reactions & Unsteady Steps</h2>
+                <p><strong>Outdoor Task:</strong> Draw a straight line on the ground (e.g., with chalk or a stick). Each team member must try to walk heel-to-toe along this line for 5 meters, eyes forward. How many steps did you manage without stepping off the line? This simulates impaired coordination.</p>
+                <p><strong>Digital Challenge:</strong> This is a "Quick Tap" challenge, but your reactions will be artificially delayed. Click the "Tap Now!" button as soon as it appears. Your score will reflect your reaction time. Only ONE click per team.</p>
+                <button id="reactionButton" class="button button-primary hidden">Tap Now!</button>
+                <p id="reactionTimeDisplay" class="my-4"></p>
+                <button id="station2Next" class="button button-success hidden">Next Station</button>
+                <div id="station2Feedback" class="feedback hidden"></div>
+            </div>
+
+            <!-- Station 3: Risky Decisions & Consequences -->
+            <div id="station3" class="challenge-section hidden">
+                <h2>Station 3: Risky Decisions & Unintended Consequences</h2>
+                <p><strong>Outdoor Task:</strong> Imagine you're at a party. You need to decide whether to walk home alone through an unfamiliar path or call a sober friend for a ride. Discuss as a team: What are the potential risks and benefits of each choice, especially if someone has been drinking?</p>
+                <p><strong>Digital Challenge:</strong> Read the scenario and choose the best course of action. Your choice impacts your "score" for responsible decision-making.</p>
+                <p class="my-4">You are at a friend's party. Everyone is having fun, and some people are drinking. Your ride just canceled on you. It's late, and you live about 30 minutes away by foot, through some dark streets. You have a little money for a taxi, but not much. What do you do?</p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 my-6">
+                    <button class="option-button" data-choice="A">A) Start walking home alone; it's just 30 minutes.</button>
+                    <button class="option-button" data-choice="B">B) Call another friend or family member for a sober ride, even if it's late.</button>
+                    <button class="option-button" data-choice="C">C) Stay at the party longer, hoping someone else will offer a ride eventually.</button>
+                </div>
+                <div id="station3Feedback" class="feedback hidden"></div>
+            </div>
+
+            <!-- Station 4: Communication Breakdown -->
+            <div id="station4" class="challenge-section hidden">
+                <h2>Station 4: Communication Breakdown</h2>
+                <p><strong>Outdoor Task:</strong> Play a game of "Broken Telephone" (Whisper Challenge) with your team. Stand 5-10 meters apart if possible. The first person whispers a complex sentence to the second, who whispers it to the third, and so on. The last person says it aloud. How much did it change? This simulates how alcohol can impair clear communication and understanding.</p>
+                <p><strong>Digital Challenge:</strong> Your team needs to collaboratively answer a simple riddle, but the hint is intentionally vague, simulating impaired clarity. Only when you've discussed the outdoor task can you reveal the full hint.</p>
+                <p class="my-4">I have cities, but no houses; forests, but no trees; and water, but no fish. What am I?</p>
+                <button id="revealHintButton" class="button button-primary">Reveal Vague Hint</button>
+                <p id="vagueHint" class="hidden my-4 text-lg italic text-gray-600"></p>
+                <input type="text" id="station4Answer" placeholder="Type your team's answer here">
+                <button id="station4Submit" class="button button-primary">Submit Answer</button>
+                <div id="station4Feedback" class="feedback hidden"></div>
+            </div>
+
+            <!-- End Screen / Final Reflection -->
+            <div id="endScreen" class="challenge-section hidden">
+                <h2>Congratulations, Team!</h2>
+                <p>You have completed "The Consequence Course".</p>
+                <p>Your final score: <span id="finalScore" class="font-bold text-xl text-green-700">0</span> points.</p>
+                <p>This game aimed to give you a small glimpse into how alcohol can impair senses, slow reactions, affect judgment, and break down communication. Remember:</p>
+                <ul class="list-disc list-inside text-left mx-auto max-w-md my-4 text-gray-700">
+                    <li><strong>Impaired Vision & Judgment:</strong> Alcohol affects how clearly you see and think.</li>
+                    <li><strong>Slowed Reactions & Coordination:</strong> Your body's response time and ability to move precisely are compromised.</li>
+                    <li><strong>Risky Decisions:</strong> Alcohol lowers inhibitions, leading to choices you might regret later.</li>
+                    <li><strong>Communication Breakdown:</strong> It becomes harder to express yourself and understand others.</li>
+                </ul>
+                <p>The best decision is always to avoid alcohol, especially as a teenager. If you ever find yourself in a situation where alcohol is present, remember to prioritize your safety, make responsible choices, and always have a plan for how you'll get home safely with sober friends or family.</p>
+                <button id="restartButton" class="button button-primary">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Custom Modal for Messages -->
+        <div id="gameModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="modal-close-button" onclick="closeModal()">&times;</span>
+                <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+                <p id="modalMessage" class="mb-4"></p>
+                <button id="modalActionButton" class="button button-primary hidden" onclick="closeModal()">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const __app_id = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const __initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase imports (if needed, though not directly used for this local game logic)
+        /*
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let app, db, auth, userId;
+
+        if (firebaseConfig) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("User signed in:", userId);
+                    // You could potentially save game progress here if it were a persistent game
+                } else {
+                    console.log("No user signed in. Attempting anonymous sign-in.");
+                    try {
+                        if (__initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                        userId = auth.currentUser?.uid || crypto.randomUUID();
+                        console.log("Signed in anonymously:", userId);
+                    } catch (error) {
+                        console.error("Firebase authentication error:", error);
+                    }
+                }
+            });
+        } else {
+            console.warn("Firebase config not found. Running game without persistence.");
+            userId = crypto.randomUUID(); // Generate a random ID for local play
+        }
+        */
+
+        // Game State Variables
+        let currentStation = 0;
+        let teamScore = 0;
+        let gameTimerInterval;
+        let timeLeft = 300; // 5 minutes in seconds (adjustable)
+        const totalStations = 4; // Total number of interactive stations
+
+        // DOM Elements
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
+        const gamePlayArea = document.getElementById('gamePlayArea');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const restartButton = document.getElementById('restartButton');
+
+        // Station 1 Elements
+        const station1 = document.getElementById('station1');
+        const scrambledWordSpan = document.getElementById('scrambledWord');
+        const station1AnswerInput = document.getElementById('station1Answer');
+        const station1SubmitButton = document.getElementById('station1Submit');
+        const station1Feedback = document.getElementById('station1Feedback');
+        const secretWord = "BALANCE"; // The word to be unscrambled
+        const scrambledWords = ["CABALNE", "ACBLAEN", "ALBACEN"]; // Different scrambles for "BALANCE"
+
+        // Station 2 Elements
+        const station2 = document.getElementById('station2');
+        const reactionButton = document.getElementById('reactionButton');
+        const reactionTimeDisplay = document.getElementById('reactionTimeDisplay');
+        const station2NextButton = document.getElementById('station2Next');
+        const station2Feedback = document.getElementById('station2Feedback');
+        let reactionDelayTimeout;
+        let startTime;
+
+        // Station 3 Elements
+        const station3 = document.getElementById('station3');
+        const station3OptionButtons = document.querySelectorAll('#station3 .option-button');
+        const station3Feedback = document.getElementById('station3Feedback');
+
+        // Station 4 Elements
+        const station4 = document.getElementById('station4');
+        const revealHintButton = document.getElementById('revealHintButton');
+        const vagueHintParagraph = document.getElementById('vagueHint');
+        const station4AnswerInput = document.getElementById('station4Answer');
+        const station4SubmitButton = document.getElementById('station4Submit');
+        const station4Feedback = document.getElementById('station4Feedback');
+        const riddleAnswer = "A MAP";
+
+        // Modal Elements
+        const gameModal = document.getElementById('gameModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalActionButton = document.getElementById('modalActionButton');
+
+        // --- Utility Functions ---
+
+        /**
+         * Shuffles the letters of a word to create a scrambled version.
+         * @param {string} word The word to scramble.
+         * @returns {string} The scrambled word.
+         */
+        function scrambleWord(word) {
+            const a = word.split("");
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a.join("");
+        }
+
+        /**
+         * Displays a custom modal message.
+         * @param {string} title The title of the modal.
+         * @param {string} message The message content.
+         * @param {boolean} showActionButton Whether to show an "OK" button.
+         * @param {Function} [actionCallback] Callback function when the action button is clicked.
+         */
+        function showModal(title, message, showActionButton = true, actionCallback = null) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            if (showActionButton) {
+                modalActionButton.classList.remove('hidden');
+                modalActionButton.onclick = () => {
+                    closeModal();
+                    if (actionCallback) actionCallback();
+                };
+            } else {
+                modalActionButton.classList.add('hidden');
+            }
+            gameModal.classList.remove('hidden');
+        }
+
+        /**
+         * Closes the custom modal.
+         */
+        function closeModal() {
+            gameModal.classList.add('hidden');
+        }
+
+
+        /**
+         * Starts the game timer.
+         */
+        function startTimer() {
+            clearInterval(gameTimerInterval); // Clear any existing timer
+            gameTimerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(gameTimerInterval);
+                    endGame(false); // End game if time runs out
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the displayed team score.
+         */
+        function updateScore(points) {
+            teamScore += points;
+            scoreDisplay.textContent = teamScore;
+        }
+
+        /**
+         * Moves the game to the next station.
+         */
+        function nextStation() {
+            // Hide all stations
+            document.querySelectorAll('.challenge-section').forEach(section => {
+                if (section.id !== 'startScreen' && section.id !== 'endScreen') {
+                    section.classList.add('hidden');
+                }
+            });
+
+            currentStation++;
+            if (currentStation === 1) {
+                station1.classList.remove('hidden');
+                // Set a random scrambled word
+                scrambledWordSpan.textContent = scrambledWords[Math.floor(Math.random() * scrambledWords.length)];
+                station1AnswerInput.value = '';
+                station1Feedback.classList.add('hidden');
+            } else if (currentStation === 2) {
+                station2.classList.remove('hidden');
+                reactionButton.classList.add('hidden');
+                reactionTimeDisplay.textContent = '';
+                station2NextButton.classList.add('hidden');
+                station2Feedback.classList.add('hidden');
+                // Simulate initial delay for reaction button appearance
+                showModal("Get Ready!", "The reaction time challenge will begin shortly. Your screen will simulate delayed reflexes.", true, () => {
+                    station1AnswerInput.classList.add('delay-sim-input'); // Apply visual delay simulation to input
+                    reactionDelayTimeout = setTimeout(() => {
+                        reactionButton.classList.remove('hidden');
+                        startTime = new Date().getTime(); // Start time when button appears
+                    }, 3000); // Button appears after 3 seconds, simulating slow processing
+                });
+
+            } else if (currentStation === 3) {
+                station3.classList.remove('hidden');
+                station3Feedback.classList.add('hidden');
+                // Remove visual delay simulation
+                station1AnswerInput.classList.remove('delay-sim-input');
+            } else if (currentStation === 4) {
+                station4.classList.remove('hidden');
+                revealHintButton.classList.remove('hidden');
+                vagueHintParagraph.classList.add('hidden');
+                station4AnswerInput.value = '';
+                station4Feedback.classList.add('hidden');
+            } else {
+                endGame(true); // All stations completed
+            }
+        }
+
+        /**
+         * Ends the game, displaying final score or a "time's up" message.
+         * @param {boolean} completedAllStations True if all stations were completed, false if time ran out.
+         */
+        function endGame(completedAllStations) {
+            clearInterval(gameTimerInterval);
+            gamePlayArea.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreDisplay.textContent = teamScore;
+
+            if (!completedAllStations) {
+                showModal("Time's Up!", "Oh no! Your time has run out. You didn't complete all the challenges. Remember, responsible decisions often require timely action.", true);
+            } else {
+                showModal("Game Over!", "You've successfully completed The Consequence Course!", true);
+            }
+        }
+
+        /**
+         * Resets the game to its initial state.
+         */
+        function resetGame() {
+            currentStation = 0;
+            teamScore = 0;
+            timeLeft = 300;
+            timerDisplay.textContent = "05:00";
+            scoreDisplay.textContent = "0";
+
+            startScreen.classList.remove('hidden');
+            gamePlayArea.classList.add('hidden');
+            endScreen.classList.add('hidden');
+
+            // Hide all challenge sections
+            document.querySelectorAll('.challenge-section').forEach(section => {
+                if (section.id !== 'startScreen' && section.id !== 'endScreen') {
+                    section.classList.add('hidden');
+                }
+            });
+            // Clear timeouts for reaction game
+            clearTimeout(reactionDelayTimeout);
+            reactionButton.removeEventListener('click', handleReactionTap); // Remove old listener to prevent multiple
+        }
+
+        // --- Event Listeners ---
+
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            gamePlayArea.classList.remove('hidden');
+            startTimer();
+            nextStation(); // Start with the first station
+        });
+
+        restartButton.addEventListener('click', resetGame);
+
+        // Station 1 Logic
+        station1SubmitButton.addEventListener('click', () => {
+            const answer = station1AnswerInput.value.trim().toUpperCase();
+            if (answer === secretWord) {
+                updateScore(100);
+                station1Feedback.textContent = "Correct! Good job deciphering the message despite the 'blurriness'!";
+                station1Feedback.classList.remove('hidden', 'incorrect');
+                station1Feedback.classList.add('correct');
+                showModal("Well Done!", "You've passed Station 1! Understanding how alcohol impairs vision and judgment is key.", true, nextStation);
+            } else {
+                updateScore(-50); // Penalty for incorrect answer
+                station1Feedback.textContent = "Incorrect. The message remains blurred. Discuss with your team and try again!";
+                station1Feedback.classList.remove('hidden', 'correct');
+                station1Feedback.classList.add('incorrect');
+                showModal("Try Again!", "That wasn't quite right. Alcohol can severely distort your perception. Discuss with your team and try to figure it out.", true);
+            }
+        });
+
+        // Station 2 Logic
+        let reactionAttempted = false; // Flag to prevent multiple taps
+
+        function handleReactionTap() {
+            if (reactionAttempted) return;
+            reactionAttempted = true;
+
+            const endTime = new Date().getTime();
+            const reactionTime = (endTime - startTime) / 1000; // in seconds
+
+            reactionTimeDisplay.textContent = `Your Reaction Time: ${reactionTime.toFixed(2)} seconds.`;
+
+            let points = 0;
+            let feedbackText = "";
+            if (reactionTime < 1.0) {
+                points = 100;
+                feedbackText = "Excellent reaction! You avoided the severe impact on reflexes.";
+                station2Feedback.classList.add('correct');
+            } else if (reactionTime < 2.5) {
+                points = 50;
+                feedbackText = "Good reaction, but a bit slow. Alcohol significantly delays your response time.";
+                station2Feedback.classList.add('correct');
+            } else {
+                points = -50;
+                feedbackText = "Very slow reaction! This simulates how alcohol drastically slows your ability to react to dangers.";
+                station2Feedback.classList.add('incorrect');
+            }
+            updateScore(points);
+            station2Feedback.textContent = feedbackText;
+            station2Feedback.classList.remove('hidden');
+            station2NextButton.classList.remove('hidden');
+            reactionButton.classList.add('hidden'); // Hide button after tap
+        }
+        reactionButton.addEventListener('click', handleReactionTap);
+
+        station2NextButton.addEventListener('click', () => {
+            reactionAttempted = false; // Reset for next play
+            nextStation();
+        });
+
+        // Station 3 Logic
+        station3OptionButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const choice = event.target.dataset.choice;
+                let feedbackText = "";
+                let points = 0;
+
+                station3Feedback.classList.remove('hidden', 'correct', 'incorrect');
+
+                if (choice === 'B') {
+                    points = 150;
+                    feedbackText = "Excellent choice! Calling a sober friend or family member is the safest and most responsible decision. It minimizes risks and shows you prioritize your safety.";
+                    station3Feedback.classList.add('correct');
+                } else if (choice === 'A') {
+                    points = -100;
+                    feedbackText = "Risky decision. Walking home alone, especially through dark streets, can put you in danger. Alcohol impairs your judgment, making such choices even riskier.";
+                    station3Feedback.classList.add('incorrect');
+                } else if (choice === 'C') {
+                    points = -50;
+                    feedbackText = "Dangerous gamble. Relying on someone else to offer a ride, or staying longer in an unsafe situation, prolongs your exposure to risk. It's better to make a proactive, safe choice.";
+                    station3Feedback.classList.add('incorrect');
+                }
+                updateScore(points);
+                station3Feedback.textContent = feedbackText;
+                showModal("Decision Made!", feedbackText + " This station highlights the importance of making responsible choices, especially when alcohol is involved.", true, nextStation);
+            });
+        });
+
+        // Station 4 Logic
+        revealHintButton.addEventListener('click', () => {
+            vagueHintParagraph.textContent = "It has lines and names, but no voice. You can open it, but not a door.";
+            vagueHintParagraph.classList.remove('hidden');
+            revealHintButton.classList.add('hidden'); // Hide hint button after revealing
+            showModal("Hint Revealed!", "Think about the 'Broken Telephone' game. Miscommunication can happen easily when clarity is impaired.", true);
+        });
+
+        station4SubmitButton.addEventListener('click', () => {
+            const answer = station4AnswerInput.value.trim().toUpperCase();
+            if (answer === riddleAnswer) {
+                updateScore(100);
+                station4Feedback.textContent = "Correct! Maps have cities, forests, and water represented, but none are real. Excellent work!";
+                station4Feedback.classList.remove('hidden', 'incorrect');
+                station4Feedback.classList.add('correct');
+                showModal("Brilliant!", "You've successfully navigated the communication breakdown. This shows how crucial clear communication is, especially when decision-making is clouded.", true, nextStation);
+            } else {
+                updateScore(-50);
+                station4Feedback.textContent = "Not quite. Remember how communication got distorted in 'Broken Telephone'? Alcohol can do that to your brain's processing. Try again!";
+                station4Feedback.classList.remove('hidden', 'correct');
+                station4Feedback.classList.add('incorrect');
+                showModal("Think Again!", "The riddle remains unsolved. Just like communication can break down with alcohol, solving problems becomes harder. Discuss with your team.", true);
+            }
+        });
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', resetGame);
+    </script>
+</body>
+</html>
